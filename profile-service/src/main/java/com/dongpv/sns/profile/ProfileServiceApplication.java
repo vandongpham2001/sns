@@ -1,4 +1,4 @@
-package com.dongpv.sns;
+package com.dongpv.sns.profile;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
