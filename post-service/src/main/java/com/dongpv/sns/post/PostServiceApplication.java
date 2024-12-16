@@ -1,13 +1,13 @@
-package com.dongpv.sns;
+package com.dongpv.sns.post;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class FileServiceApplication {
+public class PostServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(FileServiceApplication.class, args);
+		SpringApplication.run(PostServiceApplication.class, args);
 	}
 
 }

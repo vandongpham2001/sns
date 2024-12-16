@@ -1,13 +1,13 @@
-package com.dongpv.sns;
+package com.dongpv.sns.notification;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SearchServiceApplication {
+public class NotificationServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SearchServiceApplication.class, args);
+		SpringApplication.run(NotificationServiceApplication.class, args);
 	}
 
 }
