@@ -1,19 +1,19 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.4.1-SNAPSHOT'
-	id 'io.spring.dependency-management' version '1.1.6'
-	id 'com.netflix.dgs.codegen' version '6.2.1'
-	id 'org.hibernate.orm' version '6.6.2.Final'
-	id 'org.graalvm.buildtools.native' version '0.10.3'
-	id 'org.asciidoctor.jvm.convert' version '3.3.2'
+	id 'org.springframework.boot' version "$bootVer"
+	id 'io.spring.dependency-management' version "$depMgtVer"
+	id 'com.netflix.dgs.codegen' version "$dgsCodegenVer"
+	id 'org.hibernate.orm' version "$hibernateOrmVer"
+	id 'org.graalvm.buildtools.native' version "$buildToolNativeVer"
+	id 'org.asciidoctor.jvm.convert' version "$jvmConvertVer"
 }
 
-group = 'com.dongpv'
-version = '0.0.1-SNAPSHOT'
+group = sysGroup
+version = sysVersion
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(23)
+		languageVersion = JavaLanguageVersion.of(javaVersion)
 	}
 }
 
@@ -31,7 +31,7 @@ repositories {
 
 ext {
 	set('snippetsDir', file("build/generated-snippets"))
-	set('springCloudVersion', "2024.0.0-RC1")
+	set('springCloudVersion', springCloudVersion)
 }
 
 dependencies {
@@ -64,15 +64,13 @@ dependencies {
 	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.flywaydb:flyway-database-postgresql'
 	implementation 'org.liquibase:liquibase-core'
-	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
+	implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:$mybatisStarterVer"
 	implementation 'org.springframework.cloud:spring-cloud-config-server'
 	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j'
 	implementation 'org.springframework.cloud:spring-cloud-starter-config'
-	implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
-	implementation 'org.springframework.cloud:spring-cloud-starter-gateway-mvc'
 	implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
-	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
+//	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+//	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
 	implementation 'org.springframework.data:spring-data-rest-hal-explorer'
 	implementation 'org.springframework.integration:spring-integration-http'
 	implementation 'org.springframework.integration:spring-integration-jpa'
@@ -96,7 +94,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
-	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.4'
+	testImplementation "org.mybatis.spring.boot:mybatis-spring-boot-starter-test:$mybatisStarterVer"
 	testImplementation 'org.springframework.batch:spring-batch-test'
 	testImplementation 'org.springframework.cloud:spring-cloud-starter-contract-stub-runner'
 	testImplementation 'org.springframework.graphql:spring-graphql-test'
@@ -105,6 +103,9 @@ dependencies {
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	implementation "org.mapstruct:mapstruct:$mapstructVersion"
+	annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
 }
 
 dependencyManagement {
@@ -115,7 +116,7 @@ dependencyManagement {
 
 generateJava {
 	schemaPaths = ["${projectDir}/src/main/resources/graphql-client"]
-	packageName = 'com.dongpv.sns.codegen'
+	packageName = 'com.dongpv.sns.file.codegen'
 	generateClient = true
 }
 
