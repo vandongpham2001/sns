@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Properties>
+    <Property name="LOG_EXCEPTION_CONVERSION_WORD">%xwEx</Property>
+    <Property name="LOG_LEVEL_PATTERN">%5p</Property>
+    <Property name="CONSOLE_LOG_CHARSET">UTF-8</Property>
+    <Property name="FILE_LOG_CHARSET">UTF-8</Property>
+    <Property name="LOG_DATEFORMAT_PATTERN">yyyyMMdd HHmmssSSS</Property>
+    <Property name="CONSOLE_LOG_PATTERN">%-8relative - %d{${sys:LOG_DATEFORMAT_PATTERN:-yyyyMMdd HHmmssSSS}} %-20X{userId} ${sys:LOG_LEVEL_PATTERN:-%-5p} [PID:%pid] - [%-15.15t] %c%L: %m{nolookups}%n${sys:LOG_EXCEPTION_CONVERSION_WORD:-%wEx}</Property>
+    <Property name="FILE_LOG_PATTERN">%-8relative - %d{${sys:LOG_DATEFORMAT_PATTERN:-yyyyMMdd HHmmssSSS}} %-20X{userId} ${sys:LOG_LEVEL_PATTERN:-%-5p} [PID:%pid] - [%-15.15t] %c%L: %m{nolookups}%n${sys:LOG_EXCEPTION_CONVERSION_WORD:-%wEx}</Property>
+    <Property name="LOG_PATH">${spring:spring.application.name:-logs}/logs</Property>
+  </Properties>
+  <Appenders>
+    <!-- Console Appender -->
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="${CONSOLE_LOG_PATTERN}" charset="${CONSOLE_LOG_CHARSET}" />
+    </Console>
+
+    <!-- Rolling File Appender -->
+    <RollingFile name="RollingFile" fileName="${LOG_PATH}/application-${date:yyyy-MM-dd}.log"
+                 filePattern="${LOG_PATH}/application-%d{yyyy-MM-dd}.log.gz">
+      <PatternLayout>
+        <PatternLayout pattern="${FILE_LOG_PATTERN}" charset="${FILE_LOG_CHARSET}" />
+      </PatternLayout>
+      <Policies>
+        <TimeBasedTriggeringPolicy/>
+      </Policies>
+      <DefaultRolloverStrategy max="7"/> <!-- Only keep 7 file log -->
+    </RollingFile>
+
+    <Policies>
+      <SizeBasedTriggeringPolicy size="1MB"/> <!-- Limit 1MB -->
+      <TimeBasedTriggeringPolicy interval="1"/> <!-- Write by date -->
+    </Policies>
+  </Appenders>
+  <Loggers>
+    <!-- Root Logger -->
+    <Root level="info">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="RollingFile"/>
+    </Root>
+  </Loggers>
+</Configuration>
