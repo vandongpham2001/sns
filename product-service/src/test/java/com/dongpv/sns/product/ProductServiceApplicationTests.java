@@ -1,4 +1,4 @@
-package com.dongpv.sns;
+package com.dongpv.sns.product;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
