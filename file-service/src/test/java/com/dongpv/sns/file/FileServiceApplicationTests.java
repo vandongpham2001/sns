@@ -1,10 +1,10 @@
-package com.dongpv.sns;
+package com.dongpv.sns.file;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SearchServiceApplicationTests {
+class FileServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
