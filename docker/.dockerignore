@@ -1,0 +1,27 @@
+# Gradle
+.gradle/
+build/
+out/
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Misc
+test-output/
+surefire-reports/
+.env
+*.env
+
+# Docker and docs
+Dockerfile.identity-service
+README.md
