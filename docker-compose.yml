@@ -12,11 +12,11 @@ services:
     volumes:
       - ./identity-service/logs:/app/logs
     environment:
-      IDENTITY_DB_HOST: ${IDENTITY_DB_HOST}
-      IDENTITY_DB_PORT: ${IDENTITY_DB_PORT}
-      IDENTITY_DB_NAME: ${IDENTITY_DB_NAME}
-      IDENTITY_DB_USERNAME: ${IDENTITY_DB_USERNAME}
-      IDENTITY_DB_PASSWORD: ${IDENTITY_DB_PASSWORD}
+      POSTGRES_DB_HOST: ${POSTGRES_DB_HOST}
+      POSTGRES_DB_PORT: ${POSTGRES_DB_PORT}
+      POSTGRES_DB_NAME: ${POSTGRES_DB_NAME}
+      POSTGRES_DB_USERNAME: ${POSTGRES_DB_USERNAME}
+      POSTGRES_DB_PASSWORD: ${POSTGRES_DB_PASSWORD}
     depends_on:
       - postgres
     networks:
@@ -28,13 +28,13 @@ services:
     container_name: sns.postgres
     hostname: postgres
     ports:
-      - ${IDENTITY_DB_PORT}:${IDENTITY_DB_PORT}
+      - ${POSTGRES_DB_PORT}:${POSTGRES_DB_PORT}
     volumes:
       - ./data/pgdata:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: ${IDENTITY_DB_USERNAME}
-      POSTGRES_PASSWORD: ${IDENTITY_DB_PASSWORD}
-      POSTGRES_DB: ${IDENTITY_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_DB_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_DB_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB_NAME}
     networks:
       - sns-network
     restart: unless-stopped
@@ -44,13 +44,13 @@ services:
     container_name: sns.mongodb
     hostname: mongodb
     ports:
-      - ${POST_DB_PORT}:${POST_DB_PORT}
+      - ${MONGO_DB_PORT}:${MONGO_DB_PORT}
     volumes:
       - ./data/mongodb_data:/data/db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${POST_DB_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${POST_DB_PASSWORD}
-      MONGO_INITDB_DATABASE: ${POST_DB_NAME}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_DB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_DB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME}
     networks:
       - sns-network
     restart: unless-stopped
@@ -60,14 +60,14 @@ services:
     container_name: sns.neo4j
     hostname: neo4j
     ports:
-      - ${PROFILE_DB_HTTP_PORT}:${PROFILE_DB_HTTP_PORT}
-      - ${PROFILE_DB_BOLT_PORT}:${PROFILE_DB_BOLT_PORT}
+      - ${NEO4J_DB_HTTP_PORT}:${NEO4J_DB_HTTP_PORT}
+      - ${NEO4J_DB_BOLT_PORT}:${NEO4J_DB_BOLT_PORT}
     volumes:
       - ./data/neo4j_data:/data
       - ./data/neo4j_logs:/logs
       - ./data/neo4j_plugins:/plugins
     environment:
-      NEO4J_AUTH: ${PROFILE_DB_USERNAME}/${PROFILE_DB_PASSWORD}
+      NEO4J_AUTH: ${NEO4J_DB_USERNAME}/${NEO4J_DB_PASSWORD}
     networks:
       - sns-network
     restart: unless-stopped
