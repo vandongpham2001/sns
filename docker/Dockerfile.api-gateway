@@ -3,10 +3,10 @@ FROM gradle:8.5-jdk21-slim AS build
 
 WORKDIR /app
 
-COPY identity-service/build.gradle ./
-COPY identity-service/gradle.properties ./
-COPY identity-service/settings.gradle ./
-COPY identity-service/src ./src
+COPY api-gateway/build.gradle ./
+COPY api-gateway/gradle.properties ./
+COPY api-gateway/settings.gradle ./
+COPY api-gateway/src ./src
 
 RUN gradle clean build -x test --no-daemon
 
