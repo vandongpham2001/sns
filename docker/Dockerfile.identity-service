@@ -1,11 +1,12 @@
 # Stage 1: Build
-FROM gradle:8.5-jdk21-slim AS build
+FROM gradle:8.5-jdk21 AS build
 
 WORKDIR /app
 
 COPY identity-service/build.gradle ./
 COPY identity-service/gradle.properties ./
 COPY identity-service/settings.gradle ./
+COPY identity-service/lombok.config ./
 COPY identity-service/src ./src
 
 RUN gradle clean build -x test --no-daemon

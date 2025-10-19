@@ -2,13 +2,26 @@ version: '3.8'
 name: sns
 
 services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.api-gateway
+    container_name: sns.api-gateway
+    ports:
+      - "8888:8888"
+    depends_on:
+      - identity-service
+    networks:
+      - sns-network
+    restart: unless-stopped
+
   identity-service:
     build: 
       context: .
       dockerfile: ./docker/Dockerfile.identity-service
     container_name: sns.identity-service
-    ports:
-      - "8081:8081"
+    expose:
+      - "8080"
     volumes:
       - ./identity-service/logs:/app/logs
     environment:
@@ -30,7 +43,7 @@ services:
     ports:
       - ${POSTGRES_DB_PORT}:${POSTGRES_DB_PORT}
     volumes:
-      - ./data/pgdata:/var/lib/postgresql/data
+      - ./data/postgres_data:/var/lib/postgresql
     environment:
       POSTGRES_USER: ${POSTGRES_DB_USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES_DB_PASSWORD}
@@ -73,7 +86,7 @@ services:
     restart: unless-stopped
   
   kafka:
-    image: 'bitnami/kafka'
+    image: 'apache/kafka'
     container_name: sns.kafka
     hostname: kafka
     ports:
@@ -81,13 +94,18 @@ services:
       - "9093:9093"
       - "9094:9094" 
     environment:
-      - KAFKA_CFG_NODE_ID=0
-      - KAFKA_CFG_PROCESS_ROLES=controller,broker
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://localhost:9092,CONTROLLER://localhost:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
     networks:
     - sns-network
     restart: unless-stopped

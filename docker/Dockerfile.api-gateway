@@ -1,13 +1,14 @@
 # Stage 1: Build
-FROM gradle:8.5-jdk21-slim AS build
+FROM gradle:8.5-jdk21 AS build
 
 WORKDIR /app
 
-COPY api-gateway/build.gradle ./
-COPY api-gateway/gradle.properties ./
+# COPY api-gateway/gradle.properties ./ TODO: add gradle properties
 COPY api-gateway/settings.gradle ./
+COPY api-gateway/build.gradle ./
+# COPY api-gateway/lombok.config ./ TODO: add lombok config
+RUN gradle dependencies --no-daemon
 COPY api-gateway/src ./src
-
 RUN gradle clean build -x test --no-daemon
 
 # Stage 2: Run
@@ -20,6 +21,10 @@ COPY --from=build /app/build/libs/*.jar app.jar
 ENV JAVA_OPTS="-Xmx512m -Xms256m"
 
 EXPOSE 8081
+
+# Add user
+RUN adduser -D app
+USER app
 
 # Run the application
 ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar app.jar"]
