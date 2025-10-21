@@ -7,8 +7,8 @@ COPY identity-service/build.gradle ./
 COPY identity-service/gradle.properties ./
 COPY identity-service/settings.gradle ./
 COPY identity-service/lombok.config ./
+RUN gradle dependencies --no-daemon
 COPY identity-service/src ./src
-
 RUN gradle clean build -x test --no-daemon
 
 # Stage 2: Run
@@ -21,6 +21,10 @@ COPY --from=build /app/build/libs/*.jar app.jar
 ENV JAVA_OPTS="-Xmx512m -Xms256m"
 
 EXPOSE 8081
+
+# Add user
+RUN adduser -D app
+USER app
 
 # Run the application
 ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar app.jar"]
