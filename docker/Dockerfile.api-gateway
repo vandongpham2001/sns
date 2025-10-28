@@ -20,11 +20,11 @@ COPY --from=build /app/build/libs/*.jar app.jar
 
 ENV JAVA_OPTS="-Xmx512m -Xms256m"
 
-EXPOSE 8081
+EXPOSE 8888
 
 # Add user
-RUN adduser -D app
-USER app
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
 
 # Run the application
 ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar app.jar"]
