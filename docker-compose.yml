@@ -57,6 +57,71 @@ services:
       - sns-network
     restart: unless-stopped
 
+  notification-service:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.notification-service
+    container_name: sns.notification-service
+    expose:
+      - "8082"
+    volumes:
+      - ./notification-service/logs:/app/logs
+    networks:
+      - sns-network
+    restart: unless-stopped
+
+  post-service:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.post-service
+    container_name: sns.post-service
+    expose:
+      - "8083"
+    volumes:
+      - ./post-service/logs:/app/logs
+    networks:
+      - sns-network
+    restart: unless-stopped
+
+  file-service:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.file-service
+    container_name: sns.file-service
+    expose:
+      - "8084"
+    volumes:
+      - ./file-service/logs:/app/logs
+    networks:
+      - sns-network
+    restart: unless-stopped
+
+  chat-service:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.chat-service
+    container_name: sns.chat-service
+    expose:
+      - "8085"
+    volumes:
+      - ./chat-service/logs:/app/logs
+    networks:
+      - sns-network
+    restart: unless-stopped
+
+  search-service:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.search-service
+    container_name: sns.search-service
+    expose:
+      - "8086"
+    volumes:
+      - ./search-service/logs:/app/logs
+    networks:
+      - sns-network
+    restart: unless-stopped
+
   postgres:
     image: postgres:18.0-alpine
     container_name: sns.postgres
