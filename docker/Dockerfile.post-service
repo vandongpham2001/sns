@@ -1,0 +1,30 @@
+# Stage 1: Build
+FROM gradle:8.5-jdk21 AS build
+
+WORKDIR /app
+
+COPY post-service/build.gradle ./
+COPY post-service/gradle.properties ./
+COPY post-service/settings.gradle ./
+COPY post-service/lombok.config ./
+RUN gradle dependencies --no-daemon
+COPY post-service/src ./src
+RUN gradle clean build -x test --no-daemon
+
+# Stage 2: Run
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/build/libs/*.jar app.jar
+
+ENV JAVA_OPTS="-Xmx512m -Xms256m"
+
+EXPOSE 8083
+
+# Add user
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
+
+# Run the application
+ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar app.jar"]

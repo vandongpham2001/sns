@@ -36,6 +36,27 @@ services:
       - sns-network
     restart: unless-stopped
 
+  profile-service:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.profile-service
+    container_name: sns.profile-service
+    expose:
+      - "8081"
+    volumes:
+      - ./profile-service/logs:/app/logs
+    environment:
+      NEO4J_DB_HOST: ${NEO4J_DB_HOST}
+      NEO4J_DB_HTTP_PORT: ${NEO4J_DB_HTTP_PORT}
+      NEO4J_DB_BOLT_PORT: ${NEO4J_DB_BOLT_PORT}
+      NEO4J_DB_USERNAME: ${NEO4J_DB_USERNAME}
+      NEO4J_DB_PASSWORD: ${NEO4J_DB_PASSWORD}
+    depends_on:
+      - neo4j
+    networks:
+      - sns-network
+    restart: unless-stopped
+
   postgres:
     image: postgres:18.0-alpine
     container_name: sns.postgres
