@@ -1,0 +1,24 @@
+# Development Dockerfile with hot reload support
+FROM gradle:8.5-jdk21
+
+WORKDIR /app
+
+# Copy Gradle configuration files first (for better caching)
+COPY identity-service/build.gradle ./
+COPY identity-service/gradle.properties ./
+COPY identity-service/settings.gradle ./
+COPY identity-service/lombok.config ./
+
+# Download dependencies (cached layer)
+RUN gradle dependencies --no-daemon || true
+
+# Copy source code (will be overridden by volume mount in docker-compose)
+COPY identity-service/src ./src
+
+# Expose port
+EXPOSE ${IDENTITY_SERVICE_PORT}
+
+# Run with continuous build for hot reload
+# Spring Boot DevTools will handle automatic restarts
+ENTRYPOINT ["./gradlew", "bootRun", "--no-daemon"]
+

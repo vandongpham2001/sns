@@ -8,7 +8,11 @@ services:
       dockerfile: ./docker/Dockerfile.api-gateway
     container_name: sns.api-gateway
     ports:
-      - "8888:8888"
+      - ${API_GATEWAY_PORT}:${API_GATEWAY_PORT}
+    env_file:
+    - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
     depends_on:
       - identity-service
     networks:
@@ -21,15 +25,13 @@ services:
       dockerfile: ./docker/Dockerfile.identity-service
     container_name: sns.identity-service
     expose:
-      - "8080"
+      - ${IDENTITY_SERVICE_PORT}
     volumes:
       - ./identity-service/logs:/app/logs
+    env_file:
+    - .env
     environment:
-      POSTGRES_DB_HOST: ${POSTGRES_DB_HOST}
-      POSTGRES_DB_PORT: ${POSTGRES_DB_PORT}
-      POSTGRES_DB_NAME: ${POSTGRES_DB_NAME}
-      POSTGRES_DB_USERNAME: ${POSTGRES_DB_USERNAME}
-      POSTGRES_DB_PASSWORD: ${POSTGRES_DB_PASSWORD}
+      SPRING_PROFILES_ACTIVE: prod
     depends_on:
       - postgres
     networks:
@@ -42,15 +44,13 @@ services:
       dockerfile: ./docker/Dockerfile.profile-service
     container_name: sns.profile-service
     expose:
-      - "8081"
+      - ${PROFILE_SERVICE_PORT}
     volumes:
       - ./profile-service/logs:/app/logs
+    env_file:
+    - .env
     environment:
-      NEO4J_DB_HOST: ${NEO4J_DB_HOST}
-      NEO4J_DB_HTTP_PORT: ${NEO4J_DB_HTTP_PORT}
-      NEO4J_DB_BOLT_PORT: ${NEO4J_DB_BOLT_PORT}
-      NEO4J_DB_USERNAME: ${NEO4J_DB_USERNAME}
-      NEO4J_DB_PASSWORD: ${NEO4J_DB_PASSWORD}
+      SPRING_PROFILES_ACTIVE: prod
     depends_on:
       - neo4j
     networks:
@@ -63,9 +63,13 @@ services:
       dockerfile: ./docker/Dockerfile.notification-service
     container_name: sns.notification-service
     expose:
-      - "8082"
+      - ${NOTIFICATION_SERVICE_PORT}
     volumes:
       - ./notification-service/logs:/app/logs
+    env_file:
+    - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
     networks:
       - sns-network
     restart: unless-stopped
@@ -76,9 +80,13 @@ services:
       dockerfile: ./docker/Dockerfile.post-service
     container_name: sns.post-service
     expose:
-      - "8083"
+      - ${POST_SERVICE_PORT}
     volumes:
       - ./post-service/logs:/app/logs
+    env_file:
+    - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
     networks:
       - sns-network
     restart: unless-stopped
@@ -89,9 +97,13 @@ services:
       dockerfile: ./docker/Dockerfile.file-service
     container_name: sns.file-service
     expose:
-      - "8084"
+      - ${FILE_SERVICE_PORT}
     volumes:
       - ./file-service/logs:/app/logs
+    env_file:
+    - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
     networks:
       - sns-network
     restart: unless-stopped
@@ -102,9 +114,13 @@ services:
       dockerfile: ./docker/Dockerfile.chat-service
     container_name: sns.chat-service
     expose:
-      - "8085"
+      - ${CHAT_SERVICE_PORT}
     volumes:
       - ./chat-service/logs:/app/logs
+    env_file:
+    - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
     networks:
       - sns-network
     restart: unless-stopped
@@ -115,9 +131,13 @@ services:
       dockerfile: ./docker/Dockerfile.search-service
     container_name: sns.search-service
     expose:
-      - "8086"
+      - ${SEARCH_SERVICE_PORT}
     volumes:
       - ./search-service/logs:/app/logs
+    env_file:
+    - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
     networks:
       - sns-network
     restart: unless-stopped
@@ -127,13 +147,15 @@ services:
     container_name: sns.postgres
     hostname: postgres
     ports:
-      - ${POSTGRES_DB_PORT}:${POSTGRES_DB_PORT}
+      - ${IDENTITY_POSTGRES_DB_PORT}:${IDENTITY_POSTGRES_DB_PORT}
     volumes:
       - ./data/postgres_data:/var/lib/postgresql
+    env_file:
+    - .env
     environment:
-      POSTGRES_USER: ${POSTGRES_DB_USERNAME}
-      POSTGRES_PASSWORD: ${POSTGRES_DB_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB_NAME}
+      POSTGRES_USER: ${IDENTITY_POSTGRES_DB_USERNAME}
+      POSTGRES_PASSWORD: ${IDENTITY_POSTGRES_DB_PASSWORD}
+      POSTGRES_DB: ${IDENTITY_POSTGRES_DB_NAME}
     networks:
       - sns-network
     restart: unless-stopped
@@ -143,13 +165,15 @@ services:
     container_name: sns.mongodb
     hostname: mongodb
     ports:
-      - ${MONGO_DB_PORT}:${MONGO_DB_PORT}
+      - ${NOTIFICATION_MONGO_DB_PORT}:${NOTIFICATION_MONGO_DB_PORT}
     volumes:
       - ./data/mongodb_data:/data/db
+    env_file:
+    - .env
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_DB_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_DB_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME}
+      MONGO_INITDB_ROOT_USERNAME: ${NOTIFICATION_MONGO_DB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${NOTIFICATION_MONGO_DB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${NOTIFICATION_MONGO_DB_NAME}
     networks:
       - sns-network
     restart: unless-stopped
@@ -159,14 +183,16 @@ services:
     container_name: sns.neo4j
     hostname: neo4j
     ports:
-      - ${NEO4J_DB_HTTP_PORT}:${NEO4J_DB_HTTP_PORT}
-      - ${NEO4J_DB_BOLT_PORT}:${NEO4J_DB_BOLT_PORT}
+      - ${PROFILE_NEO4J_DB_HTTP_PORT}:${PROFILE_NEO4J_DB_HTTP_PORT}
+      - ${PROFILE_NEO4J_DB_BOLT_PORT}:${PROFILE_NEO4J_DB_BOLT_PORT}
     volumes:
       - ./data/neo4j_data:/data
       - ./data/neo4j_logs:/logs
       - ./data/neo4j_plugins:/plugins
+    env_file:
+    - .env
     environment:
-      NEO4J_AUTH: ${NEO4J_DB_USERNAME}/${NEO4J_DB_PASSWORD}
+      NEO4J_AUTH: ${PROFILE_NEO4J_DB_USERNAME}/${PROFILE_NEO4J_DB_PASSWORD}
     networks:
       - sns-network
     restart: unless-stopped
@@ -179,6 +205,8 @@ services:
       - "9092:9092"
       - "9093:9093"
       - "9094:9094" 
+    env_file:
+    - .env
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller

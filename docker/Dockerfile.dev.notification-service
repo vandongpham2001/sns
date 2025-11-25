@@ -1,0 +1,24 @@
+# Development Dockerfile with hot reload support
+FROM gradle:8.5-jdk21
+
+WORKDIR /app
+
+# Copy Gradle configuration files first (for better caching)
+COPY notification-service/build.gradle ./
+COPY notification-service/gradle.properties ./
+COPY notification-service/settings.gradle ./
+COPY notification-service/lombok.config ./
+
+# Download dependencies (cached layer)
+RUN gradle dependencies --no-daemon || true
+
+# Copy source code (will be overridden by volume mount in docker-compose)
+COPY notification-service/src ./src
+
+# Expose port
+EXPOSE ${NOTIFICATION_SERVICE_PORT}
+
+# Run with continuous build for hot reload
+# Spring Boot DevTools will handle automatic restarts
+ENTRYPOINT ["./gradlew", "bootRun", "--no-daemon"]
+

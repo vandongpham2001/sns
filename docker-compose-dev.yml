@@ -1,0 +1,323 @@
+version: '3.8'
+name: sns-dev
+
+services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.dev.api-gateway
+    container_name: sns.api-gateway.dev
+    ports:
+      - ${API_GATEWAY_PORT}:${API_GATEWAY_PORT}
+    volumes:
+      # Hot reload: mount source code
+      - ./api-gateway/src:/app/src:cached
+      - ./api-gateway/build.gradle:/app/build.gradle
+      - ./api-gateway/settings.gradle:/app/settings.gradle
+      - ./api-gateway/gradle.properties:/app/gradle.properties
+      - ./api-gateway/lombok.config:/app/lombok.config
+      - ./api-gateway/logs:/app/logs
+      # Gradle cache for faster builds
+      - gradle-cache-api-gateway:/home/gradle/.gradle
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    depends_on:
+      - identity-service
+    networks:
+      - sns-network
+    restart: unless-stopped
+
+  identity-service:
+    build: 
+      context: .
+      dockerfile: ./docker/Dockerfile.dev.identity-service
+    container_name: sns.identity-service.dev
+    ports:
+      - ${IDENTITY_SERVICE_PORT}:${IDENTITY_SERVICE_PORT}
+    volumes:
+      # Hot reload: mount source code
+      - ./identity-service/src:/app/src:cached
+      - ./identity-service/build.gradle:/app/build.gradle
+      - ./identity-service/settings.gradle:/app/settings.gradle
+      - ./identity-service/gradle.properties:/app/gradle.properties
+      - ./identity-service/lombok.config:/app/lombok.config
+      - ./identity-service/logs:/app/logs
+      # Gradle cache for faster builds
+      - gradle-cache-identity-service:/home/gradle/.gradle
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      POSTGRES_DB_HOST: ${IDENTITY_POSTGRES_DB_HOST:-postgres}
+      POSTGRES_DB_PORT: ${IDENTITY_POSTGRES_DB_PORT:-5432}
+      POSTGRES_DB_NAME: ${IDENTITY_POSTGRES_DB_NAME}
+      POSTGRES_DB_USERNAME: ${IDENTITY_POSTGRES_DB_USERNAME}
+      POSTGRES_DB_PASSWORD: ${IDENTITY_POSTGRES_DB_PASSWORD}
+    depends_on:
+      - postgres
+    networks:
+      - sns-network
+    restart: unless-stopped
+
+  profile-service:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.dev.profile-service
+    container_name: sns.profile-service.dev
+    ports:
+      - ${PROFILE_SERVICE_PORT}:${PROFILE_SERVICE_PORT}
+    volumes:
+      # Hot reload: mount source code
+      - ./profile-service/src:/app/src:cached
+      - ./profile-service/build.gradle:/app/build.gradle
+      - ./profile-service/settings.gradle:/app/settings.gradle
+      - ./profile-service/gradle.properties:/app/gradle.properties
+      - ./profile-service/lombok.config:/app/lombok.config
+      - ./profile-service/logs:/app/logs
+      # Gradle cache for faster builds
+      - gradle-cache-profile-service:/home/gradle/.gradle
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      NEO4J_DB_HOST: ${PROFILE_NEO4J_DB_HOST:-neo4j}
+      NEO4J_DB_HTTP_PORT: ${PROFILE_NEO4J_DB_HTTP_PORT:-7474}
+      NEO4J_DB_BOLT_PORT: ${PROFILE_NEO4J_DB_BOLT_PORT:-7687}
+      NEO4J_DB_USERNAME: ${PROFILE_NEO4J_DB_USERNAME}
+      NEO4J_DB_PASSWORD: ${PROFILE_NEO4J_DB_PASSWORD}
+    depends_on:
+      - neo4j
+    networks:
+      - sns-network
+    restart: unless-stopped
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.dev.notification-service
+    container_name: sns.notification-service.dev
+    ports:
+      - ${NOTIFICATION_SERVICE_PORT}:${NOTIFICATION_SERVICE_PORT}
+    volumes:
+      # Hot reload: mount source code
+      - ./notification-service/src:/app/src:cached
+      - ./notification-service/build.gradle:/app/build.gradle
+      - ./notification-service/settings.gradle:/app/settings.gradle
+      - ./notification-service/gradle.properties:/app/gradle.properties
+      - ./notification-service/lombok.config:/app/lombok.config
+      - ./notification-service/logs:/app/logs
+      # Gradle cache for faster builds
+      - gradle-cache-notification-service:/home/gradle/.gradle
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    networks:
+      - sns-network
+    restart: unless-stopped
+
+  post-service:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.dev.post-service
+    container_name: sns.post-service.dev
+    ports:
+      - ${POST_SERVICE_PORT}:${POST_SERVICE_PORT}
+    volumes:
+      # Hot reload: mount source code
+      - ./post-service/src:/app/src:cached
+      - ./post-service/build.gradle:/app/build.gradle
+      - ./post-service/settings.gradle:/app/settings.gradle
+      - ./post-service/gradle.properties:/app/gradle.properties
+      - ./post-service/lombok.config:/app/lombok.config
+      - ./post-service/logs:/app/logs
+      # Gradle cache for faster builds
+      - gradle-cache-post-service:/home/gradle/.gradle
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    networks:
+      - sns-network
+    restart: unless-stopped
+
+  file-service:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.dev.file-service
+    container_name: sns.file-service.dev
+    ports:
+      - ${FILE_SERVICE_PORT}:${FILE_SERVICE_PORT}
+    volumes:
+      # Hot reload: mount source code
+      - ./file-service/src:/app/src:cached
+      - ./file-service/build.gradle:/app/build.gradle
+      - ./file-service/settings.gradle:/app/settings.gradle
+      - ./file-service/gradle.properties:/app/gradle.properties
+      - ./file-service/lombok.config:/app/lombok.config
+      - ./file-service/logs:/app/logs
+      # Gradle cache for faster builds
+      - gradle-cache-file-service:/home/gradle/.gradle
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    networks:
+      - sns-network
+    restart: unless-stopped
+
+  chat-service:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.dev.chat-service
+    container_name: sns.chat-service.dev
+    ports:
+      - ${CHAT_SERVICE_PORT}:${CHAT_SERVICE_PORT}
+    volumes:
+      # Hot reload: mount source code
+      - ./chat-service/src:/app/src:cached
+      - ./chat-service/build.gradle:/app/build.gradle
+      - ./chat-service/settings.gradle:/app/settings.gradle
+      - ./chat-service/gradle.properties:/app/gradle.properties
+      - ./chat-service/lombok.config:/app/lombok.config
+      - ./chat-service/logs:/app/logs
+      # Gradle cache for faster builds
+      - gradle-cache-chat-service:/home/gradle/.gradle
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    networks:
+      - sns-network
+    restart: unless-stopped
+
+  search-service:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.dev.search-service
+    container_name: sns.search-service.dev
+    ports:
+      - ${SEARCH_SERVICE_PORT}:${SEARCH_SERVICE_PORT}
+    volumes:
+      # Hot reload: mount source code
+      - ./search-service/src:/app/src:cached
+      - ./search-service/build.gradle:/app/build.gradle
+      - ./search-service/settings.gradle:/app/settings.gradle
+      - ./search-service/gradle.properties:/app/gradle.properties
+      - ./search-service/lombok.config:/app/lombok.config
+      - ./search-service/logs:/app/logs
+      # Gradle cache for faster builds
+      - gradle-cache-search-service:/home/gradle/.gradle
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    networks:
+      - sns-network
+    restart: unless-stopped
+
+  sns-web:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.dev.sns-web
+    container_name: sns.web.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      # Hot reload: mount source code
+      - ./sns-web/src:/app/src:cached
+      - ./sns-web/public:/app/public
+      - ./sns-web/package.json:/app/package.json
+      - ./sns-web/package-lock.json:/app/package-lock.json
+      - ./sns-web/pnpm-lock.yaml:/app/pnpm-lock.yaml
+      - ./sns-web/next.config.ts:/app/next.config.ts
+      - ./sns-web/tsconfig.json:/app/tsconfig.json
+      - ./sns-web/tailwind.config.ts:/app/tailwind.config.ts
+      - ./sns-web/postcss.config.mjs:/app/postcss.config.mjs
+      - ./sns-web/components.json:/app/components.json
+      # Preserve node_modules (anonymous volume)
+      - /app/node_modules
+      - /app/.next
+    environment:
+      NODE_ENV: development
+      WATCHPACK_POLLING: "true"
+    networks:
+      - sns-network
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:18.0-alpine
+    container_name: sns.postgres
+    hostname: postgres
+    ports:
+      - ${IDENTITY_POSTGRES_DB_PORT}:${IDENTITY_POSTGRES_DB_PORT}
+    volumes:
+      - ./data/postgres_data:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: ${IDENTITY_POSTGRES_DB_USERNAME}
+      POSTGRES_PASSWORD: ${IDENTITY_POSTGRES_DB_PASSWORD}
+      POSTGRES_DB: ${IDENTITY_POSTGRES_DB_NAME}
+    networks:
+      - sns-network
+    restart: unless-stopped
+  
+  mongodb:
+    image: mongo
+    container_name: sns.mongodb
+    hostname: mongodb
+    ports:
+      - ${NOTIFICATION_MONGO_DB_PORT}:${NOTIFICATION_MONGO_DB_PORT}
+    volumes:
+      - ./data/mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${NOTIFICATION_MONGO_DB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${NOTIFICATION_MONGO_DB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${NOTIFICATION_MONGO_DB_NAME}
+    networks:
+      - sns-network
+    restart: unless-stopped
+
+  neo4j:
+    image: neo4j
+    container_name: sns.neo4j
+    hostname: neo4j
+    ports:
+      - ${PROFILE_NEO4J_DB_HTTP_PORT}:${PROFILE_NEO4J_DB_HTTP_PORT}
+      - ${PROFILE_NEO4J_DB_BOLT_PORT}:${PROFILE_NEO4J_DB_BOLT_PORT}
+    volumes:
+      - ./data/neo4j_data:/data
+      - ./data/neo4j_logs:/logs
+      - ./data/neo4j_plugins:/plugins
+    environment:
+      NEO4J_AUTH: ${PROFILE_NEO4J_DB_USERNAME}/${PROFILE_NEO4J_DB_PASSWORD}
+    networks:
+      - sns-network
+    restart: unless-stopped
+  
+  kafka:
+    image: 'apache/kafka'
+    container_name: sns.kafka
+    hostname: kafka
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+      - "9094:9094" 
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://localhost:9092,CONTROLLER://localhost:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
+    networks:
+      - sns-network
+    restart: unless-stopped
+
+networks:
+  sns-network:
+    driver: bridge
+    name: sns-network
+
+volumes:
+  # Gradle cache volumes for each service (faster rebuilds)
+  gradle-cache-api-gateway:
+  gradle-cache-identity-service:
+  gradle-cache-profile-service:
+  gradle-cache-notification-service:
+  gradle-cache-post-service:
+  gradle-cache-file-service:
+  gradle-cache-chat-service:
+  gradle-cache-search-service:
+

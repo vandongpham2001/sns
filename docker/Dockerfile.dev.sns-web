@@ -1,0 +1,37 @@
+# Development Dockerfile for Next.js frontend with hot reload
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Enable corepack for pnpm support
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Copy package files first (for better caching)
+COPY sns-web/package*.json ./
+COPY sns-web/pnpm-lock.yaml* ./
+
+# Install dependencies (will be preserved in anonymous volume)
+RUN if [ -f pnpm-lock.yaml ]; then \
+      pnpm install; \
+    else \
+      npm install; \
+    fi
+
+# Copy configuration files (will be overridden by volume mount in docker-compose)
+COPY sns-web/next.config.ts* ./
+COPY sns-web/tsconfig.json* ./
+COPY sns-web/tailwind.config.ts* ./
+COPY sns-web/postcss.config.mjs* ./
+COPY sns-web/components.json* ./
+
+# Copy source code (will be overridden by volume mount in docker-compose)
+COPY sns-web/src ./src
+COPY sns-web/public ./public
+
+# Expose Next.js dev server port
+EXPOSE 3000
+
+# Run Next.js dev server with hot reload
+# Use pnpm if lock file exists, otherwise npm
+CMD ["sh", "-c", "if [ -f pnpm-lock.yaml ]; then pnpm run dev; else npm run dev; fi"]
+
