@@ -10,7 +10,7 @@ services:
     ports:
       - ${API_GATEWAY_PORT}:${API_GATEWAY_PORT}
     env_file:
-    - .env
+    - .env.gateway
     environment:
       SPRING_PROFILES_ACTIVE: prod
     depends_on:
@@ -29,7 +29,7 @@ services:
     volumes:
       - ./identity-service/logs:/app/logs
     env_file:
-    - .env
+    - .env.identity
     environment:
       SPRING_PROFILES_ACTIVE: prod
     depends_on:
@@ -48,7 +48,7 @@ services:
     volumes:
       - ./profile-service/logs:/app/logs
     env_file:
-    - .env
+    - .env.profile
     environment:
       SPRING_PROFILES_ACTIVE: prod
     depends_on:
@@ -67,9 +67,12 @@ services:
     volumes:
       - ./notification-service/logs:/app/logs
     env_file:
-    - .env
+    - .env.notification
     environment:
       SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      - mongodb
+      - kafka
     networks:
       - sns-network
     restart: unless-stopped
@@ -84,9 +87,11 @@ services:
     volumes:
       - ./post-service/logs:/app/logs
     env_file:
-    - .env
+    - .env.post
     environment:
       SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      - mongodb
     networks:
       - sns-network
     restart: unless-stopped
@@ -101,9 +106,11 @@ services:
     volumes:
       - ./file-service/logs:/app/logs
     env_file:
-    - .env
+    - .env.file
     environment:
       SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      - mongodb
     networks:
       - sns-network
     restart: unless-stopped
@@ -118,9 +125,11 @@ services:
     volumes:
       - ./chat-service/logs:/app/logs
     env_file:
-    - .env
+    - .env.chat
     environment:
       SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      - mongodb
     networks:
       - sns-network
     restart: unless-stopped
@@ -135,7 +144,7 @@ services:
     volumes:
       - ./search-service/logs:/app/logs
     env_file:
-    - .env
+    - .env.search
     environment:
       SPRING_PROFILES_ACTIVE: prod
     networks:
@@ -147,58 +156,51 @@ services:
     container_name: sns.postgres
     hostname: postgres
     ports:
-      - ${IDENTITY_POSTGRES_DB_PORT}:${IDENTITY_POSTGRES_DB_PORT}
+      - ${POSTGRES_DB_PORT}:${POSTGRES_DB_PORT}
     volumes:
       - ./data/postgres_data:/var/lib/postgresql
     env_file:
-    - .env
-    environment:
-      POSTGRES_USER: ${IDENTITY_POSTGRES_DB_USERNAME}
-      POSTGRES_PASSWORD: ${IDENTITY_POSTGRES_DB_PASSWORD}
-      POSTGRES_DB: ${IDENTITY_POSTGRES_DB_NAME}
+    - .env.postgres
     networks:
       - sns-network
     restart: unless-stopped
-  
+
   mongodb:
-    image: mongo
+    image: bitnami/mongodb:latest
     container_name: sns.mongodb
     hostname: mongodb
     ports:
-      - ${NOTIFICATION_MONGO_DB_PORT}:${NOTIFICATION_MONGO_DB_PORT}
+      - ${MONGO_DB_PORT}:${MONGO_DB_PORT}
     volumes:
-      - ./data/mongodb_data:/data/db
+      - ./data/mongodb_data:/bitnami/mongodb
+      - ./init/mongodb:/docker-entrypoint-initdb.d
     env_file:
-    - .env
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${NOTIFICATION_MONGO_DB_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${NOTIFICATION_MONGO_DB_PASSWORD}
-      MONGO_INITDB_DATABASE: ${NOTIFICATION_MONGO_DB_NAME}
+    - .env.mongo
     networks:
       - sns-network
     restart: unless-stopped
 
   neo4j:
-    image: neo4j
+    image: neo4j:5.26.18
     container_name: sns.neo4j
     hostname: neo4j
     ports:
-      - ${PROFILE_NEO4J_DB_HTTP_PORT}:${PROFILE_NEO4J_DB_HTTP_PORT}
-      - ${PROFILE_NEO4J_DB_BOLT_PORT}:${PROFILE_NEO4J_DB_BOLT_PORT}
+      - ${NEO4J_DB_HTTP_PORT}:${NEO4J_DB_HTTP_PORT}
+      - ${NEO4J_DB_BOLT_PORT}:${NEO4J_DB_BOLT_PORT}
     volumes:
       - ./data/neo4j_data:/data
       - ./data/neo4j_logs:/logs
       - ./data/neo4j_plugins:/plugins
     env_file:
-    - .env
+    - .env.neo4j
     environment:
-      NEO4J_AUTH: ${PROFILE_NEO4J_DB_USERNAME}/${PROFILE_NEO4J_DB_PASSWORD}
+      NEO4J_AUTH: ${NEO4J_DB_USERNAME}/${NEO4J_DB_PASSWORD}
     networks:
       - sns-network
     restart: unless-stopped
   
   kafka:
-    image: 'apache/kafka'
+    image: 'apache/kafka:4.1.1'
     container_name: sns.kafka
     hostname: kafka
     ports:
@@ -206,20 +208,7 @@ services:
       - "9093:9093"
       - "9094:9094" 
     env_file:
-    - .env
-    environment:
-      KAFKA_NODE_ID: 1
-      KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://localhost:9092,CONTROLLER://localhost:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_NUM_PARTITIONS: 3
+    - .env.kafka
     networks:
     - sns-network
     restart: unless-stopped

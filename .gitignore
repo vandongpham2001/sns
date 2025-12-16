@@ -1,6 +1,18 @@
 .vscode
 .idea
 .env
+.env.gateway
+.env.identity
+.env.profile
+.env.notification
+.env.post
+.env.file
+.env.chat
+.env.search
+.env.mongo
+.env.neo4j
+.env.postgres
+.env.kafka
 
 logs
 
