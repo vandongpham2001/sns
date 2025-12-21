@@ -20,7 +20,8 @@ COPY --from=build /app/build/libs/*.jar app.jar
 
 ENV JAVA_OPTS="-Xmx512m -Xms256m"
 
-EXPOSE 8083
+ARG POST_SERVICE_PORT=8083
+EXPOSE ${POST_SERVICE_PORT}
 
 # Add user
 RUN addgroup -S spring && adduser -S spring -G spring

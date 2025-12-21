@@ -20,7 +20,8 @@ COPY --from=build /app/build/libs/*.jar app.jar
 
 ENV JAVA_OPTS="-Xmx512m -Xms256m"
 
-EXPOSE 8888
+ARG API_GATEWAY_PORT=8888
+EXPOSE ${API_GATEWAY_PORT}
 
 # Add user
 RUN addgroup -S spring && adduser -S spring -G spring

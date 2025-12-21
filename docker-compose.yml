@@ -1,4 +1,3 @@
-version: '3.8'
 name: sns
 
 services:
@@ -8,7 +7,7 @@ services:
       dockerfile: ./docker/Dockerfile.api-gateway
     container_name: sns.api-gateway
     ports:
-      - ${API_GATEWAY_PORT}:${API_GATEWAY_PORT}
+      - "${API_GATEWAY_PORT}:8888"
     env_file:
     - .env.gateway
     environment:
@@ -25,7 +24,7 @@ services:
       dockerfile: ./docker/Dockerfile.identity-service
     container_name: sns.identity-service
     expose:
-      - ${IDENTITY_SERVICE_PORT}
+      - "8080"
     volumes:
       - ./identity-service/logs:/app/logs
     env_file:
@@ -44,7 +43,7 @@ services:
       dockerfile: ./docker/Dockerfile.profile-service
     container_name: sns.profile-service
     expose:
-      - ${PROFILE_SERVICE_PORT}
+      - "8081"
     volumes:
       - ./profile-service/logs:/app/logs
     env_file:
@@ -63,7 +62,7 @@ services:
       dockerfile: ./docker/Dockerfile.notification-service
     container_name: sns.notification-service
     expose:
-      - ${NOTIFICATION_SERVICE_PORT}
+      - "8082"
     volumes:
       - ./notification-service/logs:/app/logs
     env_file:
@@ -83,7 +82,7 @@ services:
       dockerfile: ./docker/Dockerfile.post-service
     container_name: sns.post-service
     expose:
-      - ${POST_SERVICE_PORT}
+      - "8083"
     volumes:
       - ./post-service/logs:/app/logs
     env_file:
@@ -102,7 +101,7 @@ services:
       dockerfile: ./docker/Dockerfile.file-service
     container_name: sns.file-service
     expose:
-      - ${FILE_SERVICE_PORT}
+      - "8084"
     volumes:
       - ./file-service/logs:/app/logs
     env_file:
@@ -121,7 +120,7 @@ services:
       dockerfile: ./docker/Dockerfile.chat-service
     container_name: sns.chat-service
     expose:
-      - ${CHAT_SERVICE_PORT}
+      - "8085"
     volumes:
       - ./chat-service/logs:/app/logs
     env_file:
@@ -140,7 +139,7 @@ services:
       dockerfile: ./docker/Dockerfile.search-service
     container_name: sns.search-service
     expose:
-      - ${SEARCH_SERVICE_PORT}
+      - "8086"
     volumes:
       - ./search-service/logs:/app/logs
     env_file:
@@ -156,7 +155,7 @@ services:
     container_name: sns.postgres
     hostname: postgres
     ports:
-      - ${POSTGRES_DB_PORT}:${POSTGRES_DB_PORT}
+      - "${POSTGRES_DB_PORT}:5432"
     volumes:
       - ./data/postgres_data:/var/lib/postgresql
     env_file:
@@ -170,7 +169,7 @@ services:
     container_name: sns.mongodb
     hostname: mongodb
     ports:
-      - ${MONGO_DB_PORT}:${MONGO_DB_PORT}
+      - "${MONGO_DB_PORT}:27017"
     volumes:
       - ./data/mongodb_data:/bitnami/mongodb
       - ./init/mongodb:/docker-entrypoint-initdb.d
@@ -185,8 +184,8 @@ services:
     container_name: sns.neo4j
     hostname: neo4j
     ports:
-      - ${NEO4J_DB_HTTP_PORT}:${NEO4J_DB_HTTP_PORT}
-      - ${NEO4J_DB_BOLT_PORT}:${NEO4J_DB_BOLT_PORT}
+      - "${NEO4J_DB_HTTP_PORT}:7474"
+      - "${NEO4J_DB_BOLT_PORT}:7687"
     volumes:
       - ./data/neo4j_data:/data
       - ./data/neo4j_logs:/logs
@@ -204,9 +203,10 @@ services:
     container_name: sns.kafka
     hostname: kafka
     ports:
-      - "9092:9092"
-      - "9093:9093"
-      - "9094:9094" 
+      - "${KAFKA_CLIENT_PORT}:9092"
+    expose:
+      - "9093"
+      - "9094"
     env_file:
     - .env.kafka
     networks:

@@ -20,7 +20,8 @@ COPY --from=build /app/build/libs/*.jar app.jar
 
 ENV JAVA_OPTS="-Xmx512m -Xms256m"
 
-EXPOSE 8085
+ARG CHAT_SERVICE_PORT=8085
+EXPOSE ${CHAT_SERVICE_PORT}
 
 # Add user
 RUN addgroup -S spring && adduser -S spring -G spring
