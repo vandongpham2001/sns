@@ -3,19 +3,26 @@ FROM gradle:8.5-jdk21
 
 WORKDIR /app
 
-# Copy Gradle configuration files first (for better caching)
+# Copy Gradle Wrapper
+COPY api-gateway/gradle ./gradle
+COPY api-gateway/gradlew ./gradlew
+COPY api-gateway/gradlew.bat ./gradlew.bat
+# RUN chmod +x gradlew
+
+# Copy Gradle configuration files (for better caching)
 COPY api-gateway/build.gradle ./
 COPY api-gateway/gradle.properties ./
 COPY api-gateway/settings.gradle ./
 COPY api-gateway/lombok.config ./
 
 # Download dependencies (cached layer)
-RUN gradle dependencies --no-daemon || true
+RUN ./gradlew dependencies --no-daemon || true
 
 # Copy source code (will be overridden by volume mount in docker-compose)
 COPY api-gateway/src ./src
 
 # Expose port
+ARG API_GATEWAY_PORT=8888
 EXPOSE ${API_GATEWAY_PORT}
 
 # Run with continuous build for hot reload
